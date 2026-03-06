@@ -1,0 +1,46 @@
+# ─── Node ────────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# ─── Python ──────────────────────────────────────────────────────────────────
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ─── ML artefacts (regenerate with: python model/train.py) ───────────────────
+ml-service/model/saved/
+ml-service/chroma_store/
+
+# ─── HuggingFace model cache ─────────────────────────────────────────────────
+.cache/
+
+# ─── Secrets — NEVER commit ──────────────────────────────────────────────────
+.env
+*.env
+!.env.example
+
+# ─── OS junk ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Temp files left by Claude agent ─────────────────────────────────────────
+tmpclaude-*

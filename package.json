@@ -1,0 +1,16 @@
+{
+  "name": "neurixai",
+  "version": "1.0.0",
+  "description": "BCBA Copilot — Clinical AI for autism therapists",
+  "scripts": {
+    "dev":    "concurrently \"npm run server\" \"npm run client\" \"npm run ml\"",
+    "server": "cd server && nodemon server.js",
+    "client": "cd client && npm run dev",
+    "ml":     "cd ml-service && uvicorn main:app --reload --port 8000",
+    "train":  "cd ml-service && python model/train.py",
+    "seed":   "cd server && node scripts/seedDemoChildren.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
