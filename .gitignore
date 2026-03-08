@@ -16,8 +16,10 @@ build/
 .eggs/
 
 # ─── ML artefacts (regenerate with: python model/train.py) ───────────────────
+ml-service/saved/
 ml-service/model/saved/
 ml-service/chroma_store/
+*.pkl
 
 # ─── HuggingFace model cache ─────────────────────────────────────────────────
 .cache/
@@ -44,3 +46,8 @@ logs/
 
 # ─── Temp files left by Claude agent ─────────────────────────────────────────
 tmpclaude-*
+tasks/
+
+# ─── Business / internal docs ────────────────────────────────────────────────
+*.docx
+*.pdf

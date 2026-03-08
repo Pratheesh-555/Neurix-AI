@@ -2,10 +2,15 @@ const express = require('express');
 const cors    = require('cors');
 require('dotenv').config();
 
-const authRoutes  = require('./routes/auth');
-const childRoutes = require('./routes/child');
+const authRoutes    = require('./routes/auth');
+const childRoutes   = require('./routes/child');
+const programRoutes = require('./routes/program');
+const sessionRoutes = require('./routes/session');
 
 const inputSanitizer = require('./middleware/inputSanitizer');
+
+// Initialise in-process queue worker on startup
+require('./queues/programQueue');
 
 const app = express();
 
@@ -23,6 +28,8 @@ app.use(inputSanitizer);
 // --- Routes ---
 app.use('/api/auth',     authRoutes);
 app.use('/api/children', childRoutes);
+app.use('/api/programs', programRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // --- Health check ---
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
