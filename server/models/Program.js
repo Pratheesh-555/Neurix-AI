@@ -66,4 +66,9 @@ const programSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Compound indexes — covers analytics queries: overview, outcomes, shap-summary
+programSchema.index({ bcbaId: 1, status: 1 });
+programSchema.index({ bcbaId: 1, createdAt: -1 });
+programSchema.index({ childId: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Program', programSchema);

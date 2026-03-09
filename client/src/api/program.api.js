@@ -13,8 +13,7 @@ export const logActivity        = (id, data)     => api.post(`/api/sessions/${id
 export const triggerPivot       = (id, activityId) => api.post(`/api/sessions/${id}/pivot`, { activityId });
 export const getSessionSummary  = (id)           => api.get(`/api/sessions/${id}/summary`);
 
-// Analytics — endpoints built in Phase 5 as simple aggregations on /api/auth/me + /api/programs
-export const getAnalyticsOverview = () => api.get('/api/auth/me');
-export const getProgramsForAnalytics = (childId) => childId
-  ? api.get(`/api/programs/child/${childId}`)
-  : api.get('/api/programs/child/all');
+// Analytics
+export const getAnalyticsOverview    = ()  => api.get('/api/analytics/overview');
+export const getAnalyticsOutcomes    = ()  => api.get('/api/analytics/outcomes');
+export const getAnalyticsShapSummary = ()  => api.get('/api/analytics/shap-summary');

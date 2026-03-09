@@ -2,10 +2,11 @@ const express = require('express');
 const cors    = require('cors');
 require('dotenv').config();
 
-const authRoutes    = require('./routes/auth');
-const childRoutes   = require('./routes/child');
-const programRoutes = require('./routes/program');
-const sessionRoutes = require('./routes/session');
+const authRoutes     = require('./routes/auth');
+const childRoutes    = require('./routes/child');
+const programRoutes  = require('./routes/program');
+const sessionRoutes  = require('./routes/session');
+const analyticsRoutes = require('./routes/analytics');
 
 const inputSanitizer = require('./middleware/inputSanitizer');
 
@@ -26,10 +27,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(inputSanitizer);
 
 // --- Routes ---
-app.use('/api/auth',     authRoutes);
-app.use('/api/children', childRoutes);
-app.use('/api/programs', programRoutes);
-app.use('/api/sessions', sessionRoutes);
+app.use('/api/auth',      authRoutes);
+app.use('/api/children',  childRoutes);
+app.use('/api/programs',  programRoutes);
+app.use('/api/sessions',  sessionRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // --- Health check ---
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
