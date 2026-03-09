@@ -5,44 +5,27 @@ import Navbar    from '../components/shared/Navbar';
 import StatsCard from '../components/dashboard/StatsCard';
 import ChildCard from '../components/child/ChildCard';
 import Loader    from '../components/shared/Loader';
-import { getChildren }       from '../api/child.api';
-import { getProgramHistory } from '../api/program.api';
-import { getMe }             from '../api/auth.api';
-import useAuthStore          from '../store/authStore';
+import { getChildren }          from '../api/child.api';
+import { getAnalyticsOverview } from '../api/program.api';
+import useAuthStore             from '../store/authStore';
 
 export default function Home() {
   const { user } = useAuthStore();
-
-  const { data: meData } = useQuery({
-    queryKey: ['me'],
-    queryFn:  () => getMe().then(r => r.data),
-  });
 
   const { data: childrenData, isLoading, isError } = useQuery({
     queryKey: ['children'],
     queryFn:  () => getChildren().then(r => r.data),
   });
 
-  const children = childrenData?.children || [];
-  const me       = meData?.user || user || {};
-
-  const { data: allProgsData } = useQuery({
-    queryKey: ['all-programs-home'],
-    queryFn: async () => {
-      const results = await Promise.all(
-        children.map(c => getProgramHistory(c._id).then(r => r.data.programs || []))
-      );
-      return results.flat();
-    },
-    enabled: children.length > 0,
+  // Single request replaces N parallel getProgramHistory calls
+  const { data: overviewData } = useQuery({
+    queryKey: ['analytics-overview'],
+    queryFn:  () => getAnalyticsOverview().then(r => r.data),
+    staleTime: 60_000,
   });
 
-  const allProgs = allProgsData || [];
-  const weekAgo  = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-  const programsThisWeek       = allProgs.filter(p => new Date(p.createdAt) >= weekAgo).length;
-  const childrenWithProgram    = new Set(allProgs.map(p => p.childId?._id || p.childId));
-  const childrenNeedingProgram = children.filter(c => !childrenWithProgram.has(c._id)).length;
+  const children = childrenData?.children || [];
+  const overview = overviewData || {};
 
   // Build map of childId → most recent program date for ChildCard
   const lastProgramDateByChild = allProgs.reduce((acc, p) => {
@@ -59,7 +42,7 @@ export default function Home() {
         <div className="flex items-start justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
-              Good morning, {me.name?.split(' ')[0] || 'there'} 👋
+              Good morning, {user?.name?.split(' ')[0] || 'there'} 👋
             </h1>
             <p className="text-slate-500 mt-1 text-sm">
               Here's your caseload overview for today
@@ -72,10 +55,10 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <StatsCard icon={<Users size={20} />}         label="Active Children"    value={children.length}        sub="on your caseload"      color="indigo" />
-          <StatsCard icon={<FileText size={20} />}      label="Programs This Week" value={programsThisWeek}       sub="generated last 7 days" color="green"  />
-          <StatsCard icon={<AlertCircle size={20} />}   label="Needs Program"      value={childrenNeedingProgram} sub="no program yet"        color="amber"  />
-          <StatsCard icon={<CalendarCheck size={20} />} label="Sessions This Week" value={0}                      sub="live sessions logged"  color="indigo" />
+          <StatsCard icon={<Users size={20} />}         label="Active Children"    value={overview.totalChildren        ?? children.length} sub="on your caseload"      color="indigo" />
+          <StatsCard icon={<FileText size={20} />}      label="Programs This Week" value={overview.programsThisWeek     ?? 0}               sub="generated last 7 days" color="green"  />
+          <StatsCard icon={<AlertCircle size={20} />}   label="Needs Program"      value={overview.childrenNeedingProgram ?? 0}             sub="no program yet"        color="amber"  />
+          <StatsCard icon={<CalendarCheck size={20} />} label="Sessions This Week" value={overview.totalSessions        ?? 0}               sub="live sessions logged"  color="indigo" />
         </div>
 
         <div className="flex items-center justify-between mb-4">

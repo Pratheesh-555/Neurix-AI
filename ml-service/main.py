@@ -5,7 +5,7 @@ from routes.embed   import router as embed_router
 from routes.decay   import router as decay_router
 from routes.health  import router as health_router
 
-app = FastAPI(title="BCBA Copilot ML Service", version="3.0")
+app = FastAPI(title="Neurix AI ML Service", version="3.0")
 
 app.add_middleware(
     CORSMiddleware,

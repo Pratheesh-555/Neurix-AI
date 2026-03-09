@@ -1,0 +1,31 @@
+Neurix AI — XGBoost Model Evaluation Report
+============================================================
+
+Total training samples : 4000
+Total test samples     : 1000
+Features (10)           : age, diagnosis_level, communication_level, num_interests, num_sensory_triggers, num_behavioral_challenges, learning_style, num_target_goals, prior_therapy_months, obsession_intensity
+
+Accuracy  : 0.8530
+F1 Score  : 0.8529
+
+Classification Report:
+              precision    recall  f1-score   support
+
+  No Success       0.86      0.84      0.85       489
+     Success       0.85      0.87      0.86       511
+
+    accuracy                           0.85      1000
+   macro avg       0.85      0.85      0.85      1000
+weighted avg       0.85      0.85      0.85      1000
+
+Feature Importance (XGBoost gain):
+  prior_therapy_months           0.3747
+  communication_level            0.1331
+  num_interests                  0.1248
+  num_sensory_triggers           0.0699
+  diagnosis_level                0.0569
+  obsession_intensity            0.0546
+  num_target_goals               0.0480
+  age                            0.0478
+  num_behavioral_challenges      0.0452
+  learning_style                 0.0451

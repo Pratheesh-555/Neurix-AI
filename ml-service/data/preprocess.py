@@ -2,18 +2,20 @@
 Preprocessing pipeline for ASD datasets.
 Run directly to produce a clean combined CSV:
     python data/preprocess.py
-Outputs: data/processed_combined.csv (used by model/train.py if present)
+Outputs: data/processed_combined.csv (used by training/train_model.py)
 """
 import os, pandas as pd, numpy as np
 
 DIAGNOSIS_MAP  = {'Level 1 - Mild': 1, 'Level 2 - Moderate': 2, 'Level 3 - Severe': 3}
 COMM_MAP       = {'Non-verbal': 0, 'Emerging Verbal': 1, 'Functional Verbal': 2, 'Conversational': 3}
 LEARNING_MAP   = {'Visual': 0, 'Auditory': 1, 'Kinesthetic': 2, 'Mixed': 3}
+OBSESSION_MAP  = {'Mild': 1, 'Moderate': 2, 'Intense': 3}
 
 OUTPUT_FEATURES = [
     'age', 'diagnosis_level', 'communication_level', 'num_interests',
     'num_sensory_triggers', 'num_behavioral_challenges', 'learning_style',
-    'num_target_goals', 'prior_therapy_months', 'intervention_success'
+    'num_target_goals', 'prior_therapy_months', 'obsession_intensity',
+    'intervention_success'
 ]
 
 def encode_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -58,6 +60,14 @@ def encode_df(df: pd.DataFrame) -> pd.DataFrame:
         out['learning_style'] = pd.to_numeric(df['learning_style'], errors='coerce').fillna(0)
     else:
         out['learning_style'] = 0
+
+    # Obsession intensity (10th feature) — default Moderate=2 for real datasets that lack it
+    if 'obsessionIntensity' in df.columns:
+        out['obsession_intensity'] = df['obsessionIntensity'].map(OBSESSION_MAP).fillna(2)
+    elif 'obsession_intensity' in df.columns:
+        out['obsession_intensity'] = pd.to_numeric(df['obsession_intensity'], errors='coerce').fillna(2)
+    else:
+        out['obsession_intensity'] = 2
 
     # Target label
     for col in ['intervention_success', 'Class/ASD', 'ASD_traits', 'result']:
