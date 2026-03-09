@@ -51,3 +51,16 @@ Phase 3 next: Generation Pipeline (prompt builders, Claude service, ML/Chroma se
 
 To restart ML service: cd ml-service && venv/Scripts/uvicorn main:app --reload --port 8000
 Note: first startup ~30s (downloads all-MiniLM-L6-v2 from HuggingFace on first run).
+
+---
+
+## Stream 4 — ML Architecture Hardening
+
+- [x] Fix 3: Create ml-service/utils/__init__.py
+- [x] Fix 3: Create ml-service/utils/feature_engineering.py (10 features incl. obsession_intensity)
+- [x] Fix 4: Create ml-service/utils/shap_explainer.py (Recharts-ready array output)
+- [x] Fix 1: Create ml-service/training/train_model.py (5000 synthetic + real data + eval report)
+- [x] Fix 1: Run training — Accuracy 0.8530, F1 0.8529, pkl saved (575KB → retrained with 10 features)
+- [x] Fix 2: Update ml-service/routes/predict.py (10th feature, import from utils, modelVersion v2)
+- [x] Fix 2: Verify predict response — 10 SHAP values, obsession_intensity present
+- [x] Fix 5: Update DigitalTwinPanel.jsx (projection label added)
