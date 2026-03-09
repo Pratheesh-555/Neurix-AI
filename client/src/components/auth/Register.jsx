@@ -5,6 +5,20 @@ import { register } from '../../api/auth.api';
 import useAuthStore from '../../store/authStore';
 import { useToast } from '../shared/Toast';
 
+// Defined outside the component — prevents remount on every keystroke
+function Field({ label, name, type = 'text', placeholder, required = true, value, onChange }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}{required && ' *'}</label>
+      <input
+        name={name} type={type} value={value} onChange={onChange} required={required}
+        placeholder={placeholder}
+        className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+      />
+    </div>
+  );
+}
+
 export default function Register() {
   const [form, setForm]       = useState({ name: '', email: '', password: '', licenseNumber: '', organization: '' });
   const [loading, setLoading] = useState(false);
@@ -29,17 +43,6 @@ export default function Register() {
     }
   };
 
-  const Field = ({ label, name, type = 'text', placeholder, required = true }) => (
-    <div>
-      <label className="block text-sm font-medium text-slate-700 mb-1.5">{label}{required && ' *'}</label>
-      <input
-        name={name} type={type} value={form[name]} onChange={handle} required={required}
-        placeholder={placeholder}
-        className="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-      />
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
@@ -49,11 +52,11 @@ export default function Register() {
         </div>
 
         <form onSubmit={submit} className="space-y-4">
-          <Field label="Full Name"       name="name"          placeholder="Dr. Priya Sharma" />
-          <Field label="Email"           name="email"         type="email" placeholder="bcba@clinic.com" />
-          <Field label="Password"        name="password"      type="password" placeholder="Min 8 characters" />
-          <Field label="BCBA License #"  name="licenseNumber" placeholder="BCBA-12345" />
-          <Field label="Organization"    name="organization"  placeholder="Sunshine ABA Centre" required={false} />
+          <Field label="Full Name"       name="name"          value={form.name}          onChange={handle} placeholder="Dr. Priya Sharma" />
+          <Field label="Email"           name="email"         value={form.email}         onChange={handle} type="email" placeholder="bcba@clinic.com" />
+          <Field label="Password"        name="password"      value={form.password}      onChange={handle} type="password" placeholder="Min 8 characters" />
+          <Field label="BCBA License #"  name="licenseNumber" value={form.licenseNumber} onChange={handle} placeholder="BCBA-12345" />
+          <Field label="Organization"    name="organization"  value={form.organization}  onChange={handle} placeholder="Sunshine ABA Centre" required={false} />
 
           <button disabled={loading}
             className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold py-2.5 rounded-lg transition-colors text-sm mt-2">

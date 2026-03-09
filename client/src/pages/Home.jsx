@@ -44,6 +44,13 @@ export default function Home() {
   const childrenWithProgram    = new Set(allProgs.map(p => p.childId?._id || p.childId));
   const childrenNeedingProgram = children.filter(c => !childrenWithProgram.has(c._id)).length;
 
+  // Build map of childId → most recent program date for ChildCard
+  const lastProgramDateByChild = allProgs.reduce((acc, p) => {
+    const cid = p.childId?._id || p.childId;
+    if (!acc[cid] || new Date(p.createdAt) > new Date(acc[cid])) acc[cid] = p.createdAt;
+    return acc;
+  }, {});
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
@@ -95,7 +102,13 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {children.map(child => <ChildCard key={child._id} child={child} />)}
+            {children.map(child => (
+              <ChildCard
+                key={child._id}
+                child={child}
+                lastProgramDate={lastProgramDateByChild[child._id] || null}
+              />
+            ))}
           </div>
         )}
       </main>

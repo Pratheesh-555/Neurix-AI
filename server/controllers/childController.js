@@ -46,13 +46,14 @@ const createChild = async (req, res) => {
     const child = await Child.create({
       bcbaId: req.user._id,
       name, age, diagnosisLevel, communicationLevel,
-      interests:            interests            || [],
-      obsessionIntensity,
-      sensoryProfile:       sensoryProfile       || { hypersensitive: [], hyposensitive: [], seeksBehaviors: [] },
-      behavioralChallenges: behavioralChallenges || [],
-      learningStyle,
-      currentSkills:        currentSkills        || [],
-      targetGoals:          targetGoals          || [],
+      interests:             interests             || [],
+      // Optional enum fields — omit entirely when blank so Mongoose skips validation
+      obsessionIntensity:    obsessionIntensity    || undefined,
+      learningStyle:         learningStyle         || undefined,
+      sensoryProfile:        sensoryProfile        || { hypersensitive: [], hyposensitive: [], seeksBehaviors: [] },
+      behavioralChallenges:  behavioralChallenges  || [],
+      currentSkills:         currentSkills         || [],
+      targetGoals:           targetGoals           || [],
       previousTherapyMonths: previousTherapyMonths || 0,
     });
 
