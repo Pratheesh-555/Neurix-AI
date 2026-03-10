@@ -12,6 +12,7 @@ import GenerateProgram from './pages/GenerateProgram';
 import ProgramView     from './pages/ProgramView';
 import ProgramHistory  from './pages/ProgramHistory';
 import LiveSession     from './pages/LiveSession';
+import SessionSummary  from './pages/SessionSummary';
 import Analytics       from './pages/Analytics';
 
 const qc = new QueryClient({
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/children/:id/programs"   element={<ProtectedRoute><ProgramHistory /></ProtectedRoute>} />
             <Route path="/programs/:id"            element={<ProtectedRoute><ProgramView /></ProtectedRoute>} />
             <Route path="/sessions/:id"            element={<ProtectedRoute><LiveSession /></ProtectedRoute>} />
+            <Route path="/sessions/:id/summary"    element={<ProtectedRoute><SessionSummary /></ProtectedRoute>} />
             <Route path="/analytics"               element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             <Route path="*"                        element={<Navigate to="/" replace />} />
           </Routes>

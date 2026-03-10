@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { User, Calendar, Zap, ChevronRight } from 'lucide-react';
+import { User, Calendar, Zap, ChevronRight, Trash2 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteChild } from '../../api/child.api';
 
 const LEVEL_COLOR = {
   'Level 1 - Mild':     'bg-green-100 text-green-700 border-green-200',
@@ -15,6 +17,18 @@ function fmt(dateStr) {
 export default function ChildCard({ child, lastProgramDate }) {
   const badge = LEVEL_COLOR[child.diagnosisLevel] || 'bg-slate-100 text-slate-600 border-slate-200';
   const topInterests = child.interests?.slice(0, 3) || [];
+  const queryClient = useQueryClient();
+
+  const { mutate: remove, isPending } = useMutation({
+    mutationFn: () => deleteChild(child._id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['children'] }),
+  });
+
+  function handleDelete() {
+    if (window.confirm(`Delete ${child.name}? This cannot be undone.`)) {
+      remove();
+    }
+  }
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md transition-all flex flex-col gap-3">
@@ -30,9 +44,19 @@ export default function ChildCard({ child, lastProgramDate }) {
             <p className="text-xs text-slate-500 mt-0.5">{child.age} yrs old</p>
           </div>
         </div>
-        <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${badge}`}>
-          {child.diagnosisLevel?.replace('Level ', 'L')}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${badge}`}>
+            {child.diagnosisLevel?.replace('Level ', 'L')}
+          </span>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+            title="Delete child"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Top 3 interest tags */}

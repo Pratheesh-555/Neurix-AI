@@ -142,4 +142,24 @@ function _computeScore(logs) {
   return Math.round((earned / (logs.length * 2)) * 100);
 }
 
-module.exports = { start, logActivity, pivot, getSummary };
+// ── GET /api/sessions ─────────────────────────────────────────────────────────
+// Query params: ?childId=  (optional filter)
+const getSessions = async (req, res) => {
+  try {
+    const filter = { bcbaId: req.user._id };
+    if (req.query.childId) filter.childId = req.query.childId;
+
+    const sessions = await SessionLog.find(filter)
+      .populate('childId',   'name age diagnosisLevel')
+      .populate('programId', 'program.summary')
+      .sort({ sessionDate: -1 })
+      .limit(50);
+
+    res.json({ sessions });
+  } catch (err) {
+    console.error('getSessions error:', err.message);
+    res.status(500).json({ error: 'Could not fetch sessions' });
+  }
+};
+
+module.exports = { start, logActivity, pivot, getSummary, getSessions };

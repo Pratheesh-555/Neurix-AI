@@ -27,12 +27,7 @@ export default function Home() {
   const children = childrenData?.children || [];
   const overview = overviewData || {};
 
-  // Build map of childId → most recent program date for ChildCard
-  const lastProgramDateByChild = allProgs.reduce((acc, p) => {
-    const cid = p.childId?._id || p.childId;
-    if (!acc[cid] || new Date(p.createdAt) > new Date(acc[cid])) acc[cid] = p.createdAt;
-    return acc;
-  }, {});
+  const lastProgramDateByChild = {};
 
   return (
     <div className="min-h-screen bg-slate-50">

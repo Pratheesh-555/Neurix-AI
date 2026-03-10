@@ -8,10 +8,11 @@ export const getProgramHistory  = (childId)      => api.get(`/api/programs/child
 export const approveProgram     = (id)           => api.post(`/api/programs/${id}/approve`);
 
 // Sessions
-export const startSession       = (programId)    => api.post('/api/sessions', { programId });
-export const logActivity        = (id, data)     => api.post(`/api/sessions/${id}/log`, data);
+export const startSession       = (programId)      => api.post('/api/sessions', { programId });
+export const logActivity        = (id, data)       => api.post(`/api/sessions/${id}/log`, data);
 export const triggerPivot       = (id, activityId) => api.post(`/api/sessions/${id}/pivot`, { activityId });
-export const getSessionSummary  = (id)           => api.get(`/api/sessions/${id}/summary`);
+export const getSessionSummary  = (id)             => api.get(`/api/sessions/${id}/summary`);
+export const getSessions        = (childId)        => api.get('/api/sessions', { params: childId ? { childId } : {} });
 
 // Analytics
 export const getAnalyticsOverview    = ()  => api.get('/api/analytics/overview');

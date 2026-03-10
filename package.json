@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Neurix AI — Clinical AI for autism therapists",
   "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run ml\"",
     "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run ml\"",
     "server": "cd server && node server.js",
     "client": "cd client && npm run dev",
