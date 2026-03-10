@@ -1,10 +1,10 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Zap, Clock, User } from 'lucide-react';
+import { ArrowLeft, Zap, Clock, User, BarChart3 } from 'lucide-react';
 import Navbar  from '../components/shared/Navbar';
 import Loader  from '../components/shared/Loader';
-import { getChild }          from '../api/child.api';
-import { getProgramHistory } from '../api/program.api';
+import { getChild }                    from '../api/child.api';
+import { getProgramHistory, getSessions } from '../api/program.api';
 import { DIFFICULTY_COLORS } from '../utils/constants';
 
 export default function ChildDetail() {
@@ -20,8 +20,14 @@ export default function ChildDetail() {
     queryFn:  () => getProgramHistory(id).then(r => r.data),
   });
 
+  const { data: sessionsData } = useQuery({
+    queryKey: ['sessions', id],
+    queryFn:  () => getSessions(id).then(r => r.data),
+  });
+
   const child    = childData?.child;
   const programs = histData?.programs || [];
+  const sessions = sessionsData?.sessions || [];
 
   if (isLoading) return <div className="min-h-screen bg-slate-50"><Navbar /><Loader text="Loading child profile…" /></div>;
   if (isError || !child) return (
@@ -118,6 +124,46 @@ export default function ChildDetail() {
               )}
             </div>
           </div>
+
+        {/* Session history */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <BarChart3 size={16} className="text-indigo-500" /> Session History
+          </h2>
+          {sessions.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-400 text-sm">No sessions run yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sessions.map(s => {
+                const score = s.overallEngagementScore ?? 0;
+                const scoreColor = score >= 70 ? 'text-green-700 bg-green-50'
+                                 : score >= 40 ? 'text-amber-700 bg-amber-50'
+                                 :               'text-red-700 bg-red-50';
+                return (
+                  <Link key={s._id} to={`/sessions/${s._id}/summary`}
+                    className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                        <BarChart3 size={13} className="text-indigo-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-700 group-hover:text-indigo-700">
+                          Session — {new Date(s.sessionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                        <p className="text-xs text-slate-400">{s.activityLogs?.length || 0} activity logs</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${scoreColor}`}>
+                      {score}% engagement
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
