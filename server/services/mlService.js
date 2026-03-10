@@ -15,6 +15,13 @@ const DECAY_FALLBACK = {
   decayReason:             'ML service unavailable — using default estimate',
 };
 
+const SCREENING_FALLBACK = {
+  riskLevel:    null,
+  probability:  null,
+  asdPredicted: null,
+  mlBased:      false,
+};
+
 async function predict(child) {
   try {
     const { data } = await axios.post(`${ML_URL}/predict/`, {
@@ -51,4 +58,20 @@ async function predictDecay(child) {
   }
 }
 
-module.exports = { predict, predictDecay };
+async function predictASDRisk(answers, child) {
+  try {
+    const { data } = await axios.post(`${ML_URL}/screening/predict`, {
+      answers,
+      age:              child.age,
+      speechDelay:      child.behavioralChallenges?.includes('Speech Delay') ? 1 : 0,
+      learningDisorder: child.behavioralChallenges?.includes('Learning Disorder') ? 1 : 0,
+      geneticDisorders: 0,
+    }, { timeout: 10000 });
+    return data;
+  } catch (err) {
+    console.warn('ML predictASDRisk failed (non-fatal):', err.message);
+    return SCREENING_FALLBACK;
+  }
+}
+
+module.exports = { predict, predictDecay, predictASDRisk };

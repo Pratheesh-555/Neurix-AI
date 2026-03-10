@@ -2,6 +2,7 @@ const AutismScreening = require('../models/AutismScreening');
 const SessionLog      = require('../models/SessionLog');
 const Child           = require('../models/Child');
 const { generateScreeningInterpretation } = require('../services/claudeService');
+const mlService       = require('../services/mlService');
 
 const QUESTIONS = [
   // Domain 1 — Social Communication (Q1-5, critical: 0,1,2)
@@ -32,7 +33,8 @@ const QUESTIONS = [
 
 const CRITICAL_INDICES = QUESTIONS.reduce((acc, q, i) => { if (q.critical) acc.push(i); return acc; }, []);
 
-function computeRiskLevel(answers) {
+// Fallback rule-based scorer used only when the ML service is unavailable
+function computeRiskLevelFallback(answers) {
   const total          = answers.reduce((s, a) => s + a, 0);
   const criticalFlagged = CRITICAL_INDICES.filter(i => answers[i] === 1).length;
   if (total >= 9)                          return { totalScore: total, riskLevel: 'High Risk' };
@@ -73,7 +75,13 @@ const submitScreening = async (req, res) => {
     const child = await Child.findOne({ _id: childId, bcbaId: req.user._id });
     if (!child) return res.status(404).json({ error: 'Child not found' });
 
-    const { totalScore, riskLevel } = computeRiskLevel(answers);
+    const totalScore = answers.reduce((s, a) => s + a, 0);
+
+    // ML-based risk prediction (falls back to rule-based if ML service is down)
+    const mlResult = await mlService.predictASDRisk(answers, child);
+    const riskLevel = mlResult.mlBased
+      ? mlResult.riskLevel
+      : computeRiskLevelFallback(answers).riskLevel;
     const sessionSnapshot           = await buildSessionSnapshot(childId);
     const llmInterpretation         = await generateScreeningInterpretation(
       child, answers, totalScore, riskLevel, sessionSnapshot, QUESTIONS
@@ -83,6 +91,8 @@ const submitScreening = async (req, res) => {
       childId, bcbaId: req.user._id,
       answers, totalScore, riskLevel,
       sessionSnapshot, llmInterpretation,
+      mlProbability: mlResult.probability ?? null,
+      mlBased:       mlResult.mlBased,
     });
 
     res.status(201).json({ screening });

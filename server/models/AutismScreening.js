@@ -22,6 +22,8 @@ const autismScreeningSchema = new mongoose.Schema({
   },
 
   llmInterpretation: String,
+  mlProbability:     Number,   // ASD probability from trained classifier (0-1)
+  mlBased:           { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
