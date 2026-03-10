@@ -1,4 +1,4 @@
-Neurix AI — XGBoost Model Evaluation Report
+Neurix AI â€” XGBoost Model Evaluation Report
 ============================================================
 
 Total training samples : 4000

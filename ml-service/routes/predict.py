@@ -10,7 +10,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 import joblib, numpy as np
-import shap
 
 from utils.feature_engineering import FEATURES, encode_child
 from utils.shap_explainer import get_shap_values
@@ -18,8 +17,7 @@ from utils.shap_explainer import get_shap_values
 router = APIRouter()
 
 # ← SWAP THIS PATH when maam's model arrives
-model     = joblib.load("model/saved/xgboost_model.pkl")
-explainer = shap.TreeExplainer(model)
+model = joblib.load("model/saved/xgboost_model.pkl")
 
 
 class ChildInput(BaseModel):
@@ -39,7 +37,7 @@ class ChildInput(BaseModel):
 def predict(child: ChildInput):
     X         = encode_child(child)
     prob      = float(model.predict_proba(X)[0][1]) * 100
-    shap_vals = get_shap_values(explainer, X, FEATURES)
+    shap_vals = get_shap_values(model, X, FEATURES)
 
     return {
         "successProbability": round(prob, 1),
