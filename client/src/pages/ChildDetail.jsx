@@ -1,10 +1,11 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Zap, Clock, User, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Zap, Clock, User, BarChart3, Brain } from 'lucide-react';
 import Navbar  from '../components/shared/Navbar';
 import Loader  from '../components/shared/Loader';
-import { getChild }                    from '../api/child.api';
+import { getChild }                      from '../api/child.api';
 import { getProgramHistory, getSessions } from '../api/program.api';
+import { getScreeningHistory }           from '../api/screening.api';
 import { DIFFICULTY_COLORS } from '../utils/constants';
 
 export default function ChildDetail() {
@@ -25,9 +26,15 @@ export default function ChildDetail() {
     queryFn:  () => getSessions(id).then(r => r.data),
   });
 
-  const child    = childData?.child;
-  const programs = histData?.programs || [];
-  const sessions = sessionsData?.sessions || [];
+  const { data: screeningData } = useQuery({
+    queryKey: ['screenings', id],
+    queryFn:  () => getScreeningHistory(id).then(r => r.data),
+  });
+
+  const child     = childData?.child;
+  const programs  = histData?.programs || [];
+  const sessions  = sessionsData?.sessions || [];
+  const screenings = screeningData?.screenings || [];
 
   if (isLoading) return <div className="min-h-screen bg-slate-50"><Navbar /><Loader text="Loading child profile…" /></div>;
   if (isError || !child) return (
@@ -83,6 +90,10 @@ export default function ChildDetail() {
               <Link to={`/children/${id}/generate`}
                 className="mt-5 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full">
                 <Zap size={15} /> Generate New Program
+              </Link>
+              <Link to={`/children/${id}/screening`}
+                className="mt-2 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full">
+                <Brain size={15} /> Run Autism Screening
               </Link>
             </div>
 
@@ -157,6 +168,49 @@ export default function ChildDetail() {
                     </div>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${scoreColor}`}>
                       {score}% engagement
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Screening history */}
+        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm mt-6">
+          <h2 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+            <Brain size={16} className="text-purple-500" /> Screening History
+          </h2>
+          {screenings.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-slate-400 text-sm">No screenings run yet</p>
+              <Link to={`/children/${id}/screening`}
+                className="inline-flex items-center gap-1.5 mt-3 text-sm text-purple-600 hover:underline">
+                <Brain size={13} /> Run first screening
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {screenings.map(s => {
+                const riskColor = s.riskLevel === 'High Risk'   ? 'text-red-700 bg-red-50'
+                                : s.riskLevel === 'Medium Risk' ? 'text-amber-700 bg-amber-50'
+                                :                                 'text-green-700 bg-green-50';
+                return (
+                  <Link key={s._id} to={`/screening/${s._id}`}
+                    className="flex items-center justify-between p-3 rounded-lg border border-slate-100 hover:border-purple-200 hover:bg-purple-50 transition-all group">
+                    <div className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
+                        <Brain size={13} className="text-purple-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-700 group-hover:text-purple-700">
+                          Screening — {new Date(s.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                        <p className="text-xs text-slate-400">Score: {s.totalScore}/20</p>
+                      </div>
+                    </div>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${riskColor}`}>
+                      {s.riskLevel}
                     </span>
                   </Link>
                 );

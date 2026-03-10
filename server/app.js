@@ -6,7 +6,8 @@ const authRoutes     = require('./routes/auth');
 const childRoutes    = require('./routes/child');
 const programRoutes  = require('./routes/program');
 const sessionRoutes  = require('./routes/session');
-const analyticsRoutes = require('./routes/analytics');
+const analyticsRoutes  = require('./routes/analytics');
+const screeningRoutes  = require('./routes/screening');
 
 const inputSanitizer = require('./middleware/inputSanitizer');
 
@@ -32,6 +33,7 @@ app.use('/api/children',  childRoutes);
 app.use('/api/programs',  programRoutes);
 app.use('/api/sessions',  sessionRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/screening', screeningRoutes);
 
 // --- Health check ---
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
