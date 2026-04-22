@@ -51,3 +51,5 @@ tasks/
 # ─── Business / internal docs ────────────────────────────────────────────────
 *.docx
 *.pdf
+
+/dataset
