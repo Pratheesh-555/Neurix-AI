@@ -11,8 +11,7 @@ const connectDB = async () => {
     });
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
-    console.error(`MongoDB connection error: ${err.message}`);
-    process.exit(1);
+    console.error(`MongoDB connection error: ${err.message}. Continuing in mock mode (UI only).`);
   }
 };
 

@@ -52,4 +52,24 @@ tasks/
 *.docx
 *.pdf
 
-/dataset
+# ─── Datasets (all raw data — regenerate via scripts/run_ingestion.py) ────────
+/dataset/
+dataset/
+
+# Extra safety — large binary / archive types anywhere in repo
+*.zip
+*.xlsx
+*.xls
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.parquet
+
+# DREAM sensor time-series JSONs are huge — ignore them individually too
+DREAMdataset/
+ml-service/chroma_store/
+
+# Optical flow frames
+optical_flow-001/
+optical_flow_jpg/
