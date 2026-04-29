@@ -15,7 +15,12 @@ async function findSimilar(child, n = 3) {
       },
       n
     }, { timeout: 15000 });
-    return data.similar || [];   // [{ childId, similarityScore, effectiveApproaches, interestOverlap }]
+
+    // Return full evidence objects including new clinical fields
+    return data.similar || [];
+    // Shape: [{ childId, similarityScore, source, effectiveApproaches,
+    //           interestOverlap, adosTotal, successLabel, protocol,
+    //           therapyDomain, initialCondition }]
   } catch (err) {
     console.warn('ChromaDB findSimilar failed (non-fatal):', err.message);
     return [];
@@ -34,7 +39,10 @@ async function storeEmbedding(child, effectiveApproaches = []) {
         behavioralChallenges: child.behavioralChallenges,
         targetGoals:          child.targetGoals
       },
-      effectiveApproaches
+      effectiveApproaches,
+      adosTotal:    'unknown',
+      successLabel: 'unknown',
+      protocol:     'ABA',
     }, { timeout: 10000 });
   } catch (err) {
     console.warn('ChromaDB storeEmbedding failed (non-fatal):', err.message);

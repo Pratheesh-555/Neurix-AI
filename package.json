@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node server/server.js",
     "client": "npm --prefix client run dev",
-    "ml": "cd ml-service && venv/Scripts/uvicorn main:app --reload --port 8000",
+    "ml": "cd ml-service && python -m uvicorn main:app --host 0.0.0.0 --port 8000",
     "train": "cd ml-service && python model/train.py",
     "seed": "cd server && node scripts/seedDemoChildren.js",
     "build": "cd client && npm run build"

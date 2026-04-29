@@ -4,18 +4,23 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-// Force Google DNS — local DNS refuses SRV record lookups needed by mongodb+srv://
-const dns = require('dns');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
-
+// Note: Using default system DNS for MongoDB Atlas SRV resolution
 const app       = require('./app');
 const connectDB = require('./config/db');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 (async () => {
   await connectDB();
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Neurix AI server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[ERROR] Port ${PORT} is already in use. Please kill the existing process and restart.`);
+    } else {
+      console.error(`[ERROR] Server error:`, err);
+    }
   });
 })();
