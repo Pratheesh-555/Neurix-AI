@@ -1,10 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastProvider } from './components/shared/Toast';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 import Login           from './components/auth/Login';
 import Register        from './components/auth/Register';
+import CompleteProfile from './pages/CompleteProfile';
 import Home            from './pages/Home';
 import NewChild        from './pages/NewChild';
 import ChildDetail     from './pages/ChildDetail';
@@ -21,32 +23,38 @@ const qc = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 export default function App() {
   return (
-    <QueryClientProvider client={qc}>
-      <ToastProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public */}
-            <Route path="/login"    element={<Login />} />
-            <Route path="/register" element={<Register />} />
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <QueryClientProvider client={qc}>
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public */}
+              <Route path="/login"            element={<Login />} />
+              <Route path="/register"         element={<Register />} />
+              <Route path="/complete-profile" element={<CompleteProfile />} />
 
-            {/* Protected */}
-            <Route path="/"                        element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/children/new"            element={<ProtectedRoute><NewChild /></ProtectedRoute>} />
-            <Route path="/children/:id"            element={<ProtectedRoute><ChildDetail /></ProtectedRoute>} />
-            <Route path="/children/:id/generate"   element={<ProtectedRoute><GenerateProgram /></ProtectedRoute>} />
-            <Route path="/children/:id/programs"   element={<ProtectedRoute><ProgramHistory /></ProtectedRoute>} />
-            <Route path="/programs/:id"            element={<ProtectedRoute><ProgramView /></ProtectedRoute>} />
-            <Route path="/sessions/:id"            element={<ProtectedRoute><LiveSession /></ProtectedRoute>} />
-            <Route path="/sessions/:id/summary"    element={<ProtectedRoute><SessionSummary /></ProtectedRoute>} />
-            <Route path="/children/:id/screening"  element={<ProtectedRoute><AutismScreening /></ProtectedRoute>} />
-            <Route path="/screening/:id"           element={<ProtectedRoute><ScreeningResult /></ProtectedRoute>} />
-            <Route path="/analytics"               element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-            <Route path="*"                        element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </ToastProvider>
-    </QueryClientProvider>
+              {/* Protected */}
+              <Route path="/"                        element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/children/new"            element={<ProtectedRoute><NewChild /></ProtectedRoute>} />
+              <Route path="/children/:id"            element={<ProtectedRoute><ChildDetail /></ProtectedRoute>} />
+              <Route path="/children/:id/generate"   element={<ProtectedRoute><GenerateProgram /></ProtectedRoute>} />
+              <Route path="/children/:id/programs"   element={<ProtectedRoute><ProgramHistory /></ProtectedRoute>} />
+              <Route path="/programs/:id"            element={<ProtectedRoute><ProgramView /></ProtectedRoute>} />
+              <Route path="/sessions/:id"            element={<ProtectedRoute><LiveSession /></ProtectedRoute>} />
+              <Route path="/sessions/:id/summary"    element={<ProtectedRoute><SessionSummary /></ProtectedRoute>} />
+              <Route path="/children/:id/screening"  element={<ProtectedRoute><AutismScreening /></ProtectedRoute>} />
+              <Route path="/screening/:id"           element={<ProtectedRoute><ScreeningResult /></ProtectedRoute>} />
+              <Route path="/analytics"               element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+              <Route path="*"                        element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
+

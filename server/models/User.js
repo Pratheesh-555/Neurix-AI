@@ -4,9 +4,15 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name:                   { type: String, required: true, trim: true },
   email:                  { type: String, required: true, unique: true, lowercase: true },
-  password:               { type: String, required: true, minlength: 8 },
-  licenseNumber:          { type: String, required: true },
+  // password is optional — Google OAuth users won't have one
+  password:               { type: String, minlength: 8, select: false },
+  // Google OAuth fields
+  googleId:               { type: String, sparse: true, unique: true },
+  picture:                { type: String },
+  // Profile fields (licenseNumber required for full access)
+  licenseNumber:          { type: String },
   organization:           { type: String },
+  profileComplete:        { type: Boolean, default: false },
   approvedProgramTexts:   [String],
   totalProgramsGenerated: { type: Number, default: 0 },
   totalCostInr:           { type: Number, default: 0 },
@@ -14,12 +20,13 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.password || !this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
 userSchema.methods.comparePassword = async function (candidate) {
+  if (!this.password) return false;
   return bcrypt.compare(candidate, this.password);
 };
 
